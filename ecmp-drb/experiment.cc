@@ -35,6 +35,7 @@ NS_LOG_COMPONENT_DEFINE ("FattreeSimulation");
 enum RunMode {
     ECMP,
     DRB,
+    RR, // Normal Round Robin
 };
 
 /**
@@ -117,6 +118,10 @@ std::string get_output_filename(int id, RunMode runMode, double load, uint32_t k
     else if (runMode == DRB)
     {
         filename << "drb-";
+    }    
+	else if (runMode == RR)
+    {
+        filename << "rr-";
     }
     filename << flow_size << ".xml";
     return filename.str();
@@ -178,9 +183,13 @@ int main (int argc, char *argv[])
     {
         runMode = DRB;
     }
+    else if (runModeStr.compare ("RR") == 0)
+    {
+        runMode = RR;
+    }
     else
     {
-        NS_LOG_ERROR ("Run mode must be either ECMP or DRB");
+        NS_LOG_ERROR ("Run mode must be either ECMP or DRB or RR");
         return 0;
     }
 
@@ -253,7 +262,7 @@ int main (int argc, char *argv[])
     Ipv4XPathRoutingHelper xpathRoutingHelper;
     Ipv4DrbRoutingHelper drbRoutingHelper;
 
-    if (runMode == DRB)
+    if (runMode == DRB || runMode == RR)
     {
         Config::SetDefault ("ns3::Ipv4DrbRouting::Mode", UintegerValue (0));
 
@@ -387,9 +396,9 @@ int main (int argc, char *argv[])
         }
     }
 
-    // Install DRB
+    // Install RR/DRB. drbRoutingHelper simply rotates through the paths you give in order, so we change the order.
     Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-    if (runMode == DRB)
+    if (runMode == RR)
     {
         for (uint32_t i = 0; i < edgeCount; i++)
         {
@@ -414,7 +423,36 @@ int main (int argc, char *argv[])
             }
 
         }
-    }
+    } 
+    else if (runMode == DRB) 
+    {
+        for (uint32_t i = 0; i < edgeCount; i++)
+        {
+            for (uint32_t j = 0; j < serverCount; j++)
+            {
+                uint32_t uServerIndex = i * serverCount + j;
+                for (uint32_t n = 0; n < k / 2; n++)
+                {
+                    for (uint32_t m = 0; m < k /2; m++)
+                    {
+                        uint32_t uCoreIndex = m * (k / 2) + n;
+                        uint32_t uAggregationIndex = (i / (k / 2)) * (k / 2) + m;
+                        
+                        int path = 0;
+                        int pathBase = 1;
+                        path += edgeToAggregationPath[std::make_pair (i, uAggregationIndex)] * pathBase;
+                        pathBase *= 100;
+                        int newPath = aggregationToCorePath[std::make_pair (uAggregationIndex, uCoreIndex)] * pathBase + path;
+                        Ptr<Ipv4DrbRouting> drbRouting = drbRoutingHelper.GetDrbRouting (servers.Get (uServerIndex)->GetObject<Ipv4> ());
+                        drbRouting->AddPath (newPath);
+
+                    }
+                }
+            }
+
+        }
+    }    
+        
 
     double oversubRatio = static_cast<double> (serverCount * (k / 2) * k * serverEdgeCapacity) / (aggregationCoreCapacity * (k / 2) * aggregationCount);
 
