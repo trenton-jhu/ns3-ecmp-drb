@@ -15,6 +15,15 @@ echo "============ ECMP Results ============="
 ./parse.py *.xml
 rm -rf *.xml
 
+echo "Begin to run $1 trails with parameters --runMode=RR --flowSize=$2 --load=$3"
+for ((i = 1; i <= $1; i++)); do
+    echo "Running trial $i ..."
+    ./waf --run "ecmp-drb --ID=$i --runMode=RR --flowSize=$2 --load=$3" > /dev/null
+done
+echo "============ RR Results ============="
+./parse.py *.xml
+rm -rf *.xml
+
 echo "Begin to run $1 trails with parameters --runMode=DRB --flowSize=$2 --load=$3"
 for ((i = 1; i <= $1; i++)); do
     echo "Running trial $i ..."
