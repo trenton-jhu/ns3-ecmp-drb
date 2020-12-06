@@ -13,6 +13,7 @@ for ((i = 1; i <= $1; i++)); do
 done
 echo "============ ECMP Results ============="
 ./parse.py *.xml
+echo "======================================="
 rm -rf *.xml
 
 echo "Begin to run $1 trails with parameters --runMode=RR --flowSize=$2 --load=$3"
@@ -22,6 +23,7 @@ for ((i = 1; i <= $1; i++)); do
 done
 echo "============ RR Results ============="
 ./parse.py *.xml
+echo "======================================="
 rm -rf *.xml
 
 echo "Begin to run $1 trails with parameters --runMode=DRB --flowSize=$2 --load=$3"
@@ -31,6 +33,7 @@ for ((i = 1; i <= $1; i++)); do
 done
 echo "============ DRB Results ============="
 ./parse.py *.xml
+echo "======================================="
 rm -rf *.xml
 
 exit 0
