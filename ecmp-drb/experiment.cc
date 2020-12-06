@@ -30,7 +30,7 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("FattreeSimulation");
+NS_LOG_COMPONENT_DEFINE ("ECMP-DRB-Simulation");
 
 enum RunMode {
     ECMP,
