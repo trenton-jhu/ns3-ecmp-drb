@@ -160,7 +160,7 @@ int main (int argc, char *argv[])
     cmd.AddValue ("bwServerEdge", "Server to edge bandwidth (bps)", serverEdgeCapacity);
     cmd.AddValue ("bwEdgeAgg", "Edge to aggregation bandwidth (bps)", edgeAggregationCapacity);
     cmd.AddValue ("bwAggCore", "Aggregation to core bandwidth (bps)", aggregationCoreCapacity);
-    cmd.AddValue ("runMode", "Running mode of this simulation: ECMP or DRB", runModeStr);
+    cmd.AddValue ("runMode", "Running mode of this simulation: ECMP, RR, or DRB", runModeStr);
     cmd.AddValue ("randomSeed", "Random seed, 0 for random generated", randomSeed);
     cmd.AddValue ("flowSize", "Size of each flow", flow_size_override);
     cmd.AddValue ("load", "Load of the network, between 0.0 - 1.0", load);
