@@ -189,17 +189,18 @@ def parse(fileName, print_flows=False):
 
     avg_fct = total_fct / flow_count
     avg_tp = total_throughput / flow_count
-    print("Avg FCT: %.6f" % avg_fct)
-    print("Avg throughput: %.6f" % avg_tp)
-    print("Total TX Packets: %i" % total_packets)
-    print("Total RX Packets: %i" % total_rx_packets)
+    if print_flows:
+        print("Avg FCT: %.6f" % avg_fct)
+        print("Avg throughput: %.6f" % avg_tp)
+        print("Total TX Packets: %i" % total_packets)
+        print("Total RX Packets: %i" % total_rx_packets)
 
-    flow_list.sort(key=lambda x: x.fct)
-    index_99 = int(len(flow_list) * 0.99)
-    flow_fct_99 = flow_list[index_99].fct
+        flow_list.sort(key=lambda x: x.fct)
+        index_99 = int(len(flow_list) * 0.99)
+        flow_fct_99 = flow_list[index_99].fct
 
-    print("The FCT of 99 flow is: %.6f" % flow_fct_99)
-    print("===========================================")
+        print("The FCT of 99 flow is: %.6f" % flow_fct_99)
+        print("===========================================")
     return avg_fct, avg_tp
 
 
