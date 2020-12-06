@@ -138,7 +138,6 @@ class Simulation(object):
 
 def parse(fileName, print_flows=False):
     file_obj = open(str(fileName), "r")
-    print("Reading XML file: " + str(fileName))
 
     level = 0
     sim_list = []
