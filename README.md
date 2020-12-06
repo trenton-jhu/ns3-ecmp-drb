@@ -30,6 +30,7 @@ Then, you need to move the files from the newly cloned `ns3-ecmp-drb` directory 
 ```
 cp -r ns3-ecmp-drb/ecmp-drb ns3-ecn-sharp/examples/
 cp parse.py ns-ecn-sharp/
+cp run.sh ns3-ecn-sharp/
 ```
 Now, you need to build the new files you just added. NS3 uses `./waf` to build its modules. Run the following commands:
 ```
@@ -43,7 +44,7 @@ Once you are inside the docker container, navigate to the `ns3-ecn-sharp` direct
 ```
 cd ~/ns3-ecn-sharp
 ```
-For the simplest way to run experiments, use the `run.sh` script. The usage for this script is as follow:
+For the simplest way to run experiments, use the `run.sh` script (you may need to change the permission of this script to be able to execute it). The usage for this script is as follow:
 ```
 Usage: ./run.sh [number of trails] [flow size] [load]
 ```
