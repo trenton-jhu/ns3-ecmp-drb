@@ -198,7 +198,7 @@ def parse(fileName, print_flows=False):
         index_99 = int(len(flow_list) * 0.99)
         flow_fct_99 = flow_list[index_99].fct
 
-        print("The FCT of 99 flow is: %.6f" % flow_fct_99)
+        print("p99 FCT: %.6f" % flow_fct_99)
         print("===========================================")
     return avg_fct, avg_tp
 
