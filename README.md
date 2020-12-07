@@ -6,9 +6,10 @@ and simulate several flows in the network and can output statistics like flow co
 ## How to Install
 Since NS3 is a very heavy weight framework. We use docker to simplify the installation and build steps. 
 ### Using our Google VM
-We have a Google VM with the environment and docker container already setup. You can ssh into the VM by running the following command (using the private key provided):
+We have a Google VM with the environment and docker container already setup. You can ssh into the VM by running the following command (using the private key provided in this repo):
 ```
-ssh -i private_key.pem ubuntu@tba
+sudo chmod 400 private_key.pem
+ssh -i "private_key.pem" ubuntu@35.203.168.252
 ```
 Please contact us (ywang382@jhu.edu) if you cannot connect or do not have access to this instance. Once connected, the docker container has ID `89ef7a63dfe5` you can go into the docker container by running the following command:
 ```
@@ -76,11 +77,11 @@ Program Arguments:
     --enableDcTcp:       Whether to enable DCTCP [true]
     --resequenceBuffer:  Whether to enable resequence buffer [false]
 ```
-As an example, try running the following (this may up to several minutes, run with smaller load and flow size for faster experiments):
+As an example, try running the following (this may take up to several minutes, run with smaller load and flow size for faster experiments):
 ```
 ./waf --run "ecmp-drb --K=8 --runMode=DRB --load=0.5 --flowSize=500000"
 ```
-Once this command complete, the result for this experiment will be written to an xml file. For the above parameters, the result would be saved in a file called `0-fattree-8-0.5-drb-500000.xml`
+Once this command completes, the result for this experiment will be written to an xml file. For the above parameters, the result would be saved in a file called `0-fattree-8-0.5-drb-500000.xml`
 To actually aggregate and get the results we really want, we parse the xml file using the provided `parse.py` python script (you can also run this using `python3`) by running the following:
 ```
 ./parse.py 0-fattree-8-0.5-drb-500000.xml
