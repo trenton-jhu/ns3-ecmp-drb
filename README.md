@@ -1,33 +1,36 @@
 # NS3 Network Simulations on Fat-tree Topology
 This implementation uses the [NS3](https://www.nsnam.org/) framework to run simulations for different variations of load-balancing techniques in datacenter networks. We support
-ECMP (hash-based), Round-Robin, and Digit Reversal Bouncing ([DRB](http://conferences.sigcomm.org/co-next/2013/program/p49.pdf)) techniques. The simulation builds a fat-tree topology
-and simulate several flows in the network and can output statistics like flow completion time (FCT) and throughput for comparison and analysis. 
+ECMP (hash-based), Round-Robin, and Digit Reversal Bouncing ([DRB](http://conferences.sigcomm.org/co-next/2013/program/p49.pdf)) techniques. The simulation builds a fat-tree topology and simulate several flows in the network and can output statistics like flow completion time (FCT) and throughput for comparison and analysis. 
 
 ## How to Install
 Since NS3 is a very heavy weight framework. We use docker to simplify the installation and build steps. 
 ### Using our Google VM
-We have a Google VM with the environment and docker container already setup. You can ssh into the VM by running the following command (using the private key provided in this repo):
+We have a Google VM with the environment and docker container already setup. You can ssh into the VM by running the following command (using the private key file `private_key.pem` provided in this repo):
 ```
 sudo chmod 400 private_key.pem
 ssh -i "private_key.pem" ubuntu@35.203.168.252
 ```
-Please contact us (ywang382@jhu.edu) if you cannot connect or do not have access to this instance. Once connected, the docker container has ID `89ef7a63dfe5` you can go into the docker container by running the following command:
+Please contact us (ywang382@jhu.edu) if you cannot connect or do not have access to this instance. Once connected, you need to go into the docker container with ID `89ef7a63dfe5`, you can do this by running the following command:
 ```
 sudo docker exec -it 89ef7a63dfe5 bash
 ```
-Once you are inside this docker container, you are set to run the experiments.
+If you get an error saying that this container has not started, then run the following command to start it and then go into it using the previous command.
+```
+sudo docker start 89ef7a63dfe5
+```
+Once you are inside this docker container, you are ready to run our experiments.
 
 ### Installing locally
 Make sure you have docker already installed. Then, run the docker image provided by [snowzjx/ns3-ecn-sharp](https://github.com/snowzjx/ns3-ecn-sharp) (see Acknowledgement) by running the command:
 ```
 sudo docker run -it snowzjx/ns3-ecn-sharp:optimized
 ```
-You should be inside the docker container now. Navigate to the home directory and then clone our repository:
+You should be inside the docker container now. Navigate to the home directory (inside the docker container) and then clone our repository:
 ```
 cd ~
 git clone https://github.com/trenton-jhu/ns3-ecmp-drb.git
 ```
-Then, you need to move the files from the newly cloned `ns3-ecmp-drb` directory into the `ns3-ecn-sharp` directory by doing the following:
+Then, you need to move the files from the newly cloned `ns3-ecmp-drb` directory into the `ns3-ecn-sharp` directory by doing the following (make sure you are in the home `~` directory of the docker container):
 ```
 cp -r ns3-ecmp-drb/ecmp-drb ns3-ecn-sharp/examples/
 cp parse.py ns-ecn-sharp/
@@ -41,7 +44,7 @@ cd ns3-ecn-sharp
 Once the build finishes successfully, you are set to run the experiments.
 
 ## How to Run
-Once you are inside the docker container, navigate to the `ns3-ecn-sharp` directory provided by doing:
+Once you are inside the docker container, make sure you are in the `ns3-ecn-sharp` directory provided by doing:
 ```
 cd ~/ns3-ecn-sharp
 ```
@@ -53,12 +56,10 @@ For example, try doing:
 ```
 ./run.sh 3 1000000 0.1
 ```
-This will run experiments and specify the flow size to be 1000000 (around 1 MB) and the network load to be 0.1 (the lowest network load). This will run 3 trials for each of the ECMP,
-RR, and DRB techniques and output the average FCT and throughput over these trials and the standard deviation. You can try changing the parameters to run different experiments.
+This will run experiments and specify the flow size to be 1000000 (around 1 MB) and the network load to be 0.1 (the lowest network load). This will run 3 trials for each of the ECMP, RR, and DRB techniques and output the average FCT and throughput over these trials and the standard deviation. You can try changing the parameters to run different experiments.
 
 
-To run a specific experiment with more fine-tuned parameters, NS3 uses `./waf` to build and run. Our experiment module is called `ecmp-drb`, you can run the following to check out
-the available parameters:
+To run a specific experiment with more fine-tuned parameters, NS3 uses `./waf` to build and run. Our experiment module is called `ecmp-drb`, you can run the following to checkout the available parameters:
 ```
 ./waf --run "ecmp-drb --help"
 ```
@@ -82,11 +83,11 @@ As an example, try running the following (this may take up to several minutes, r
 ./waf --run "ecmp-drb --K=8 --runMode=DRB --load=0.5 --flowSize=500000"
 ```
 Once this command completes, the result for this experiment will be written to an xml file. For the above parameters, the result would be saved in a file called `0-fattree-8-0.5-drb-500000.xml`
-To actually aggregate and get the results we really want, we parse the xml file using the provided `parse.py` python script (you can also run this using `python3`) by running the following:
+To actually aggregate and get the results we care about, we parse the xml file using the provided `parse.py` python script by running the following (you can also run this using `python3`):
 ```
 ./parse.py 0-fattree-8-0.5-drb-500000.xml
 ```
-This should print out the aggregate results including FCT, throughput and data for each flow tested to the screen.
+This should print out the aggregate results including FCT, throughput and data for each flow as well as the overall aggregate statistics for this trial to the screen.
 
 ## Acknowledgement
 This simulation code depends on several modules implemented in [snowzjx/ns3-ecn-sharp](https://github.com/snowzjx/ns3-ecn-sharp) for their work on the following papers:
