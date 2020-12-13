@@ -55,6 +55,18 @@ T rand_range (T min, T max)
     return min + ((double)max - min) * rand () / RAND_MAX;
 }
 
+void
+CheckQueueSize (Ptr<Queue> queue, int *totalSize, int *samples )
+{
+  uint32_t qSize = queue->GetNPackets ();
+
+  Simulator::Schedule (Seconds (0.01), &CheckQueueSize, queue, totalSize, samples);
+
+  *totalSize += qSize;
+  (*samples)++;
+}
+
+
 /**
  * Install simulation based on passed in parameters
  */
@@ -308,6 +320,11 @@ int main (int argc, char *argv[])
     std::map<std::pair<int, int>, uint32_t> aggregationToCorePath;
 
     NS_LOG_INFO ("Creating fat-tree topology");
+
+
+    int queueSamples[3] = {0};
+    int queueTotals[3] = {0};
+
     // Hosts to Edge Switches
     p2p.SetDeviceAttribute ("DataRate", DataRateValue (DataRate (serverEdgeCapacity)));
     for (uint32_t i = 0; i < edgeCount; i++)
@@ -319,6 +336,10 @@ int main (int argc, char *argv[])
 
             NodeContainer nodeContainer = NodeContainer (edges.Get (i), servers.Get (uServerIndex));
             NetDeviceContainer netDeviceContainer = p2p.Install (nodeContainer);
+
+            Ptr<NetDevice> nd = netDeviceContainer.Get(0);
+            Ptr<Queue> queue = DynamicCast<PointToPointNetDevice>(nd)->GetQueue ();
+            Simulator::ScheduleNow (&CheckQueueSize, queue, &queueTotals[0], &queueSamples[0]);
 
             if (dctcpEnabled)
                 tc.Install (netDeviceContainer);
@@ -344,6 +365,10 @@ int main (int argc, char *argv[])
 
             NodeContainer nodeContainer = NodeContainer (edges.Get (i), aggregations.Get (uAggregationIndex));
             NetDeviceContainer netDeviceContainer = p2p.Install (nodeContainer);
+
+            Ptr<NetDevice> nd = netDeviceContainer.Get(0);
+            Ptr<Queue> queue = DynamicCast<PointToPointNetDevice>(nd)->GetQueue ();
+            Simulator::ScheduleNow (&CheckQueueSize, queue, &queueTotals[1], &queueSamples[1]);
 
             if (dctcpEnabled)
                 tc.Install (netDeviceContainer);
@@ -373,6 +398,10 @@ int main (int argc, char *argv[])
             NodeContainer nodeContainer = NodeContainer (aggregations.Get (i), cores.Get (uCoreIndex));
             NetDeviceContainer netDeviceContainer = p2p.Install (nodeContainer);
 
+            Ptr<NetDevice> nd = netDeviceContainer.Get(0);
+            Ptr<Queue> queue = DynamicCast<PointToPointNetDevice>(nd)->GetQueue ();
+            Simulator::ScheduleNow (&CheckQueueSize, queue, &queueTotals[2], &queueSamples[2]);
+            
             if (dctcpEnabled)
                 tc.Install (netDeviceContainer);
 
@@ -470,6 +499,10 @@ int main (int argc, char *argv[])
 
     std::string output_filename = get_output_filename(simulation_id, runMode, load, k, flow_size_override);
     flowMonitor->SerializeToXmlFile(output_filename, true, true);
+
+
+    for (int i = 0; i < 3; i++)
+        std::cout << (double) queueTotals[i] / queueSamples[i] << std::endl;
 
     Simulator::Destroy ();
     NS_LOG_INFO ("Stop simulation");
