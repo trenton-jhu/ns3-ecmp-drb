@@ -33,7 +33,7 @@ git clone https://github.com/trenton-jhu/ns3-ecmp-drb.git
 Then, you need to move the files from the newly cloned `ns3-ecmp-drb` directory into the `ns3-ecn-sharp` directory by doing the following (make sure you are in the home `~` directory of the docker container):
 ```
 cp -r ns3-ecmp-drb/ecmp-drb ns3-ecn-sharp/examples/
-cp ns3-ecmp-drb/parse.py ns-ecn-sharp/
+cp ns3-ecmp-drb/parse.py ns3-ecn-sharp/
 cp ns3-ecmp-drb/run.sh ns3-ecn-sharp/
 ```
 Now, you need to build the new files you just added. NS3 uses `./waf` to build its modules. Run the following commands:
